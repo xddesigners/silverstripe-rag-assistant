@@ -29,6 +29,8 @@ class RAGIndexTask extends BuildTask
 {
     private static $segment = 'RAGIndexTask';
 
+    private static $url_segment = 'RAGIndexTask';
+
     protected $title = 'RAG: Index pages for AI assistant';
 
     protected $description = 'Generates embeddings for filtered SilverStripe pages and stores them for the AI referral assistant.';
@@ -58,6 +60,9 @@ class RAGIndexTask extends BuildTask
 
     public function run($request)
     {
+        // Indexing loads many large embedding arrays — raise the limit for this CLI task
+        ini_set('memory_limit', '512M');
+
         $apiKey = $this->resolveApiKey();
         if (!$apiKey) {
             $this->log('ERROR: No OpenAI API key configured. Set OPENAI_API_KEY in .env.');
@@ -78,17 +83,21 @@ class RAGIndexTask extends BuildTask
 
         $this->log(sprintf('%d pages found.', count($pages)));
 
+        // Build the cache inline during indexing to avoid a separate DB reload at the end
+        $cacheChunks = [];
         $totalChunks = 0;
+
         foreach ($pages as $page) {
             $text = $this->extractText($page);
             if (strlen($text) < 50) {
                 continue;
             }
 
-            $chunks = $this->splitIntoChunks($text);
-            $url    = Director::absoluteURL($page->Link());
-            $title  = $page->Title;
-            $count  = 0;
+            $chunks    = $this->splitIntoChunks($text);
+            $url       = Director::absoluteURL($page->Link());
+            $title     = $page->Title;
+            $pageClass = get_class($page);
+            $count     = 0;
 
             foreach ($chunks as $chunk) {
                 $embedding = $this->getEmbedding($chunk, $apiKey);
@@ -102,10 +111,19 @@ class RAGIndexTask extends BuildTask
                     'Title'         => $title,
                     'ChunkText'     => $chunk,
                     'Embedding'     => implode(',', $embedding),
-                    'PageClassName' => get_class($page),
+                    'PageClassName' => $pageClass,
                     'PageID'        => $page->ID,
                 ]);
                 $record->write();
+
+                $cacheChunks[] = [
+                    'title'      => $title,
+                    'url'        => $url,
+                    'text'       => $chunk,
+                    'embedding'  => $embedding,
+                    'page_class' => $pageClass,
+                ];
+
                 $count++;
                 $totalChunks++;
 
@@ -115,7 +133,7 @@ class RAGIndexTask extends BuildTask
             $this->log("  OK [{$count} chunks] {$title}");
         }
 
-        $this->rebuildCache();
+        $this->writeCache($cacheChunks);
         $this->log(sprintf('Done. %d chunks indexed and cached.', $totalChunks));
     }
 
@@ -283,19 +301,8 @@ class RAGIndexTask extends BuildTask
         return $data['data'][0]['embedding'] ?? null;
     }
 
-    private function rebuildCache(): void
+    private function writeCache(array $chunks): void
     {
-        $chunks = [];
-        foreach (RAGContentChunk::get() as $chunk) {
-            $chunks[] = [
-                'title'      => $chunk->Title,
-                'url'        => $chunk->SourceURL,
-                'text'       => $chunk->ChunkText,
-                'embedding'  => $chunk->getEmbeddingArray(),
-                'page_class' => $chunk->PageClassName,
-            ];
-        }
-
         $cachePath = BASE_PATH . '/silverstripe-cache/rag_chunks.bin';
         file_put_contents($cachePath, serialize($chunks));
         $this->log(sprintf('  Cache saved: %d chunks → %s', count($chunks), $cachePath));
