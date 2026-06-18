@@ -1,0 +1,12 @@
+it:
+  Assistant:
+    Title: 'Trovare rapidamente la pagina giusta?'
+    Subtitle: 'Fai una domanda e ti indirizzeremo alle informazioni corrette.'
+    Placeholder: 'Es.: cos'è un'indennità di consigliere comunale?'
+    InputLabel: 'Fai una domanda'
+    Button: 'Cerca'
+    MoreInfo: 'Ulteriori informazioni'
+    Online: 'Online'
+    Searching: 'Ricerca in corso…'
+    Error: 'Si è verificato un errore, riprova.'
+    ConnectionError: 'Errore di connessione, riprova.'

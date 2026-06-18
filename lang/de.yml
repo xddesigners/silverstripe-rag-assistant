@@ -1,0 +1,12 @@
+de:
+  Assistant:
+    Title: 'Schnell die richtige Seite finden?'
+    Subtitle: 'Stellen Sie eine Frage und wir verweisen Sie auf die richtigen Informationen.'
+    Placeholder: 'Z.B. was ist eine Ratsmitgliedsvergütung?'
+    InputLabel: 'Eine Frage stellen'
+    Button: 'Suchen'
+    MoreInfo: 'Mehr Informationen'
+    Online: 'Online'
+    Searching: 'Suchen…'
+    Error: 'Ein Fehler ist aufgetreten, bitte versuchen Sie es erneut.'
+    ConnectionError: 'Verbindungsfehler, bitte versuchen Sie es erneut.'

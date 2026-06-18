@@ -1,0 +1,14 @@
+nl:
+  Assistant:
+    Title: 'Stel een vraag aan onze assistent'
+    Subtitle: 'Stel een vraag en wij verwijzen u naar de juiste informatie.'
+    Placeholder: 'Stel uw vraag'
+    InputLabel: 'Stel een vraag'
+    Button: 'Zoek'
+    MoreInfo: 'Meer informatie'
+    Online: 'Online'
+    Offline: 'Offline'
+    OfflineMessage: 'De assistent is tijdelijk niet beschikbaar.'
+    Searching: 'Zoeken…'
+    Error: 'Er is een fout opgetreden, probeer het opnieuw.'
+    ConnectionError: 'Verbindingsfout, probeer het opnieuw.'

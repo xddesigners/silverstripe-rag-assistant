@@ -1,0 +1,7 @@
+---
+Name: ragassistantroutes
+After: '#approutes'
+---
+SilverStripe\Control\Director:
+  rules:
+    'api/assistant//$Action': 'XD\RAGAssistant\Controllers\AssistantController'

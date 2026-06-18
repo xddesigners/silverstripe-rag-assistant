@@ -1,0 +1,12 @@
+es:
+  Assistant:
+    Title: '¿Encontrar la página correcta rápidamente?'
+    Subtitle: 'Haga una pregunta y le indicaremos la información correcta.'
+    Placeholder: 'Ej.: ¿qué es una dieta de concejal?'
+    InputLabel: 'Hacer una pregunta'
+    Button: 'Buscar'
+    MoreInfo: 'Más información'
+    Online: 'En línea'
+    Searching: 'Buscando…'
+    Error: 'Se ha producido un error, por favor inténtelo de nuevo.'
+    ConnectionError: 'Error de conexión, por favor inténtelo de nuevo.'

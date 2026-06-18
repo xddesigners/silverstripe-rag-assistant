@@ -1,0 +1,23 @@
+---
+Name: ragassistant
+---
+# Set OPENAI_API_KEY in .env (recommended).
+# Models and dimensions can be overridden per project.
+XD\RAGAssistant\Controllers\AssistantController:
+  openai_api_key: ''
+  chat_model: 'gpt-4o-mini'
+  embedding_model: 'text-embedding-3-small'
+  embedding_dimensions: 512
+  top_k: 5
+  # Email address for quota-exhaustion alerts. Falls back to Email.admin_email.
+  admin_email: ''
+
+SilverStripe\CMS\Controllers\ContentController:
+  extensions:
+    - XD\RAGAssistant\Extensions\AssistantExtension
+
+XD\RAGAssistant\Tasks\RAGIndexTask:
+  openai_api_key: ''
+  embedding_model: 'text-embedding-3-small'
+  embedding_dimensions: 512
+  chunk_size: 800

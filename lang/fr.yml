@@ -1,0 +1,12 @@
+fr:
+  Assistant:
+    Title: 'Trouver rapidement la bonne page ?'
+    Subtitle: 'Posez une question et nous vous orienterons vers les bonnes informations.'
+    Placeholder: 'Ex. : qu'est-ce qu'une indemnité de conseiller municipal ?'
+    InputLabel: 'Poser une question'
+    Button: 'Rechercher'
+    MoreInfo: 'Plus d''informations'
+    Online: 'En ligne'
+    Searching: 'Recherche…'
+    Error: 'Une erreur est survenue, veuillez réessayer.'
+    ConnectionError: 'Erreur de connexion, veuillez réessayer.'

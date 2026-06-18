@@ -1,0 +1,14 @@
+en:
+  Assistant:
+    Title: 'Find the right page quickly'
+    Subtitle: 'Ask a question and we will point you to the right information.'
+    Placeholder: 'Ask your question'
+    InputLabel: 'Ask a question'
+    Button: 'Search'
+    MoreInfo: 'More information'
+    Online: 'Online'
+    Offline: 'Offline'
+    OfflineMessage: 'The assistant is temporarily unavailable.'
+    Searching: 'Searching…'
+    Error: 'An error occurred, please try again.'
+    ConnectionError: 'Connection error, please try again.'

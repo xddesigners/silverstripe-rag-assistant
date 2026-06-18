@@ -1,0 +1,14 @@
+{
+    "private": true,
+    "scripts": {
+        "build": "yarn build:js && yarn build:css",
+        "build:js": "esbuild client/src/js/assistent.js --bundle --minify --format=iife --outfile=client/dist/js/assistent.js",
+        "build:css": "sass client/src/scss/assistent.scss client/dist/css/assistent.css --style=compressed --no-source-map",
+        "watch": "concurrently \"esbuild client/src/js/assistent.js --bundle --format=iife --outfile=client/dist/js/assistent.js --watch\" \"sass client/src/scss/_assistent.scss client/dist/css/assistent.css --watch --no-source-map\""
+    },
+    "devDependencies": {
+        "concurrently": "^8.0.0",
+        "esbuild": "^0.21.0",
+        "sass": "^1.77.0"
+    }
+}
