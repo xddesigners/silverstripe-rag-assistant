@@ -118,12 +118,15 @@ XD\RAGAssistant\Controllers\AssistantController:
   enable_logging: true
 ```
 
-Log entries are written to `silverstripe-rag-assistant.log` in the project root (`BASE_PATH`). The file is created automatically on first use. Override the filename via YAML:
+Log entries are written to `assets/logs/silverstripe-rag-assistant.log` by default. The `logs/` directory and a `.htaccess` (denying web access) are created automatically on first use.
+
+Paths starting with `assets/` are resolved via SilverStripe's `ASSETS_PATH`. All other paths are relative to `BASE_PATH`. Override via YAML:
 
 ```yaml
 XD\RAGAssistant\Controllers\AssistantController:
   enable_logging: true
-  log_file: 'logs/rag-assistant.log'  # relative to BASE_PATH
+  log_file: 'assets/logs/rag-assistant.log'   # inside assets/ — auto-protected
+  # log_file: 'silverstripe-cache/rag.log'    # outside webroot — always safe
 ```
 
 A typical conversation produces entries like:

@@ -55,8 +55,12 @@ class AssistantController extends Controller
     /** Enable textual request logging to a dedicated log file. */
     private static $enable_logging = false;
 
-    /** Log filename, written to BASE_PATH. Override via YAML. */
-    private static $log_file = 'silverstripe-rag-assistant.log';
+    /**
+     * Log file path. Paths starting with `assets/` are resolved via ASSETS_PATH
+     * and a .htaccess is auto-created to deny web access. All other paths are
+     * relative to BASE_PATH. Override via YAML.
+     */
+    private static $log_file = 'assets/logs/silverstripe-rag-assistant.log';
 
     /**
      * System prompt sent to the chat model.
@@ -437,8 +441,25 @@ PROMPT;
         if (!$this->config()->get('enable_logging')) {
             return;
         }
+        $path = $this->resolveLogPath();
+        $dir  = dirname($path);
+        if (!is_dir($dir)) {
+            @mkdir($dir, 0755, true);
+            // Auto-protect the directory with .htaccess when inside the webroot
+            @file_put_contents($dir . '/.htaccess', "Require all denied\n");
+        }
         $line = sprintf("[%s] [%s] %s\n", date('Y-m-d H:i:s'), strtoupper($level), $message);
-        @file_put_contents(BASE_PATH . '/' . $this->config()->get('log_file'), $line, FILE_APPEND | LOCK_EX);
+        @file_put_contents($path, $line, FILE_APPEND | LOCK_EX);
+    }
+
+    private function resolveLogPath(): string
+    {
+        $file = (string) $this->config()->get('log_file');
+        // assets/... → resolve via ASSETS_PATH so it works regardless of webroot structure
+        if (str_starts_with($file, 'assets/')) {
+            return ASSETS_PATH . '/' . substr($file, strlen('assets/'));
+        }
+        return BASE_PATH . '/' . $file;
     }
 
     private function checkRateLimit(HTTPRequest $request): bool
