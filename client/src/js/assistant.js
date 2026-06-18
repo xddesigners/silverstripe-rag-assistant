@@ -1,7 +1,7 @@
 /**
  * RAG Assistant floating widget
- * Import in your project: import { initAssistant } from 'path/to/assistent.js'
- * Or load client/dist/js/assistent.js as a standalone script.
+ * Import in your project: import { initAssistant } from 'path/to/assistant.js'
+ * Or load client/dist/js/assistant.js as a standalone script.
  */
 
 export function initAssistant() {

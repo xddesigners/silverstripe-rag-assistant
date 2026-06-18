@@ -168,7 +168,7 @@ XD\RAGAssistant\Tasks\RAGIndexTask:
 Add the include to your layout template, typically just before `</body>`:
 
 ```silverstripe
-<% include Assistent %>
+<% include RagAssistant %>
 ```
 
 ## Indexing content

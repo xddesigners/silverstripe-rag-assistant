@@ -1,5 +1,5 @@
-<% require javascript('xddesigners/silverstripe-rag-assistant: client/dist/js/assistent.js') %>
-<% require css('xddesigners/silverstripe-rag-assistant: client/dist/css/assistent.css') %>
+<% require javascript('xddesigners/silverstripe-rag-assistant: client/dist/js/assistant.js') %>
+<% require css('xddesigners/silverstripe-rag-assistant: client/dist/css/assistant.css') %>
 
 <div class="assistant-widget js-assistant"
      data-endpoint="/api/assistant/ask"

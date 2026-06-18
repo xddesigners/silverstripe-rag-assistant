@@ -94,7 +94,7 @@ PROMPT;
         }
 
         $body     = json_decode((string) $request->getBody(), true);
-        $question = trim((string) ($body['question'] ?? $body['vraag'] ?? ''));
+        $question = trim((string) ($body['question'] ?? ''));
         $history  = $this->sanitizeHistory($body['history'] ?? []);
 
         if (strlen($question) < 5) {
@@ -376,19 +376,19 @@ PROMPT;
         $time     = date('d-m-Y H:i');
 
         $html = "
-<p>De AI-assistent op <a href=\"{$siteUrl}\">{$siteUrl}</a> is offline gegaan omdat het OpenAI-budget is opgebruikt.</p>
-<p><strong>Tijdstip:</strong> {$time}</p>
-<h3>Wat te doen</h3>
+<p>The AI assistant on <a href=\"{$siteUrl}\">{$siteUrl}</a> has gone offline because the OpenAI quota has been exhausted.</p>
+<p><strong>Time:</strong> {$time}</p>
+<h3>What to do</h3>
 <ol>
-    <li>Vul het tegoed aan in het <a href=\"https://platform.openai.com/settings/organization/billing\">OpenAI-dashboard</a>.</li>
-    <li>Verwijder daarna het vlagbestand op de server:<br><code>{$flagPath}</code></li>
-    <li>De widget gaat automatisch weer online zodra het vlagbestand is verwijderd.</li>
+    <li>Top up your credit in the <a href=\"https://platform.openai.com/settings/organization/billing\">OpenAI dashboard</a>.</li>
+    <li>Then remove the flag file on the server:<br><code>{$flagPath}</code></li>
+    <li>The widget will automatically come back online once the flag file is removed.</li>
 </ol>
         ";
 
         Email::create()
             ->setTo($to)
-            ->setSubject('[AI-assistent] Tokens op – widget offline')
+            ->setSubject('[AI assistant] Quota exhausted – widget offline')
             ->setHTMLBody($html)
             ->send();
     }
