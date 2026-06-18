@@ -229,10 +229,14 @@ class RAGIndexTask extends BuildTask
             }
         }
 
-        // Elemental blocks — optional, works if dnadesign/silverstripe-elemental is installed
+        // Elemental blocks — optional, works if dnadesign/silverstripe-elemental is installed.
+        // Suppress E_USER_WARNING: template rendering during CLI may call $Link on TaskRunner,
+        // which has no url_segment. The content is still extracted correctly.
         $elementalExtension = 'DNADesign\\Elemental\\Extensions\\ElementalPageExtension';
         if (class_exists($elementalExtension) && $page->hasExtension($elementalExtension)) {
+            set_error_handler(static fn() => true, E_USER_WARNING);
             $elementContent = $page->getElementsForSearch();
+            restore_error_handler();
             if ($elementContent) {
                 $parts[] = $elementContent;
             }
