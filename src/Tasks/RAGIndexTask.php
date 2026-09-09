@@ -7,7 +7,10 @@ use SilverStripe\Control\Director;
 use SilverStripe\Core\Environment;
 use SilverStripe\Dev\BuildTask;
 use SilverStripe\ORM\DB;
+use SilverStripe\PolyExecution\PolyOutput;
 use SilverStripe\Versioned\Versioned;
+use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Input\InputInterface;
 use XD\RAGAssistant\Models\RAGContentChunk;
 
 /**
@@ -27,13 +30,16 @@ use XD\RAGAssistant\Models\RAGContentChunk;
  */
 class RAGIndexTask extends BuildTask
 {
+    protected static string $commandName = 'RAGIndexTask';
+
     private static $segment = 'RAGIndexTask';
 
-    private static $url_segment = 'RAGIndexTask';
+    protected string $title = 'RAG: Index pages for AI assistant';
 
-    protected $title = 'RAG: Index pages for AI assistant';
+    protected static string $description = 'Generates embeddings for filtered SilverStripe pages and stores them for the AI referral assistant.';
 
-    protected $description = 'Generates embeddings for filtered SilverStripe pages and stores them for the AI referral assistant.';
+    /** @internal Set for the duration of execute() so log() can route to the task output. */
+    private ?PolyOutput $output = null;
 
     private static $embedding_model = 'text-embedding-3-small';
 
@@ -58,15 +64,17 @@ class RAGIndexTask extends BuildTask
      */
     private static $excluded_page_classes = [];
 
-    public function run($request)
+    protected function execute(InputInterface $input, PolyOutput $output): int
     {
+        $this->output = $output;
+
         // Indexing loads many large embedding arrays — raise the limit for this CLI task
         ini_set('memory_limit', '512M');
 
         $apiKey = $this->resolveApiKey();
         if (!$apiKey) {
             $this->log('ERROR: No OpenAI API key configured. Set OPENAI_API_KEY in .env.');
-            return;
+            return Command::INVALID;
         }
 
         $this->log('Starting RAG indexing...');
@@ -78,7 +86,7 @@ class RAGIndexTask extends BuildTask
 
         if (empty($pages)) {
             $this->log('No pages found. Check your indexed_classes configuration.');
-            return;
+            return Command::SUCCESS;
         }
 
         $this->log(sprintf('%d pages found.', count($pages)));
@@ -135,6 +143,8 @@ class RAGIndexTask extends BuildTask
 
         $this->writeCache($cacheChunks);
         $this->log(sprintf('Done. %d chunks indexed and cached.', $totalChunks));
+
+        return Command::SUCCESS;
     }
 
     private function getConfiguredPages(): array
@@ -321,6 +331,10 @@ class RAGIndexTask extends BuildTask
 
     private function log(string $message): void
     {
-        echo $message . PHP_EOL;
+        if ($this->output) {
+            $this->output->writeln($message);
+        } else {
+            echo $message . PHP_EOL;
+        }
     }
 }
