@@ -21,8 +21,9 @@ function mount(el) {
 
     if (!form || !toggle || !panel) return;
 
-    var endpoint  = el.dataset.endpoint || '/api/assistant/ask';
-    var isOffline = el.dataset.offline === '1';
+    var endpoint   = el.dataset.endpoint || '/api/assistant/ask';
+    var securityId = el.dataset.securityId || '';
+    var isOffline  = el.dataset.offline === '1';
     var maxLen    = parseInt(el.dataset.maxLength, 10) || 300;
     var history   = [];
 
@@ -150,7 +151,7 @@ function mount(el) {
         fetch(endpoint, {
             method:  'POST',
             headers: { 'Content-Type': 'application/json' },
-            body:    JSON.stringify({ question: question, history: history }),
+            body:    JSON.stringify({ question: question, history: history, securityID: securityId }),
         })
         .then(function(res) {
             return res.json().then(function(data) {

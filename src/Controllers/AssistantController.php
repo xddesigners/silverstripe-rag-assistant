@@ -9,6 +9,7 @@ use SilverStripe\Control\HTTPRequest;
 use SilverStripe\Control\HTTPResponse;
 use SilverStripe\Core\Environment;
 use SilverStripe\i18n\i18n;
+use SilverStripe\Security\SecurityToken;
 use XD\RAGAssistant\Models\RAGContentChunk;
 
 class AssistantController extends Controller
@@ -36,6 +37,12 @@ class AssistantController extends Controller
 
     /** Rate-limit window in seconds. */
     private static $rate_limit_window = 60;
+
+    /** Site-wide hard cap on token-spending requests per day (0 = disabled). Counts requests, not tokens. */
+    private static $daily_request_limit = 0;
+
+    /** Require the SS CSRF token on each request; blind/cross-site POSTs get 403. Disable only behind a full-page cache. */
+    private static $require_security_token = true;
 
     /** Max allowed question length in characters. Also enforced via maxlength on the frontend input. */
     private static $max_question_length = 300;
@@ -101,6 +108,13 @@ PROMPT;
         $question = trim((string) ($body['question'] ?? ''));
         $history  = $this->sanitizeHistory($body['history'] ?? []);
 
+        if ($this->config()->get('require_security_token')
+            && !hash_equals((string) SecurityToken::inst()->getValue(), (string) ($body['securityID'] ?? ''))
+        ) {
+            $this->ragLog(sprintf('Security token mismatch — ip:%s', $ipHash), 'warning');
+            return $response->setStatusCode(403)->setBody(json_encode(['error' => 'Invalid security token — please reload the page.']));
+        }
+
         if (strlen($question) < 5) {
             return $response->setStatusCode(400)->setBody(json_encode(['error' => 'Question is too short']));
         }
@@ -120,6 +134,11 @@ PROMPT;
         $apiKey = $this->resolveApiKey();
         if (!$apiKey) {
             return $response->setStatusCode(500)->setBody(json_encode(['error' => 'API key not configured']));
+        }
+
+        if (!$this->checkDailyBudget()) {
+            $this->ragLog('Daily request budget reached', 'warning');
+            return $response->setStatusCode(429)->setBody(json_encode(['error' => 'The assistant has reached its daily limit. Please try again later.']));
         }
 
         $questionEmbedding = $this->getEmbedding($question, $apiKey);
@@ -491,6 +510,37 @@ PROMPT;
 
         $timestamps[] = $now;
         @file_put_contents($file, json_encode($timestamps), LOCK_EX);
+
+        return true;
+    }
+
+    /**
+     * Site-wide daily cap on token-spending requests. Counts requests (not tokens); resets at midnight.
+     * Returns false when the day's limit is reached. A limit of 0 disables the cap.
+     */
+    private function checkDailyBudget(): bool
+    {
+        $limit = (int) $this->config()->get('daily_request_limit');
+        if ($limit <= 0) {
+            return true; // disabled
+        }
+
+        $file  = BASE_PATH . '/silverstripe-cache/rag_budget.json';
+        $today = date('Y-m-d');
+
+        $data = [];
+        if (file_exists($file)) {
+            $data = json_decode((string) @file_get_contents($file), true) ?: [];
+        }
+        if (($data['date'] ?? '') !== $today) {
+            $data = ['date' => $today, 'count' => 0];
+        }
+        if (($data['count'] ?? 0) >= $limit) {
+            return false;
+        }
+
+        $data['count'] = ($data['count'] ?? 0) + 1;
+        @file_put_contents($file, json_encode($data), LOCK_EX);
 
         return true;
     }
