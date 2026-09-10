@@ -3,6 +3,7 @@
 
 <div class="assistant-widget js-assistant"
      data-endpoint="/api/assistant/ask"
+     data-security-id="$AssistantSecurityID"
      data-offline="<% if $AssistantOffline %>1<% else %>0<% end_if %>"
      data-i18n-searching="<%t Assistant.Searching 'Searching…' %>"
      data-i18n-error="<%t Assistant.Error 'An error occurred, please try again.' %>"
