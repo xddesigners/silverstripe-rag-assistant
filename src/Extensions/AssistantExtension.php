@@ -10,7 +10,7 @@ class AssistantExtension extends Extension
 {
     public function AssistantOffline(): bool
     {
-        return file_exists(BASE_PATH . '/silverstripe-cache/rag_offline.flag');
+        return file_exists(TEMP_PATH . '/rag_offline.flag');
     }
 
     public function AssistantMaxLength(): int

@@ -154,7 +154,7 @@ PROMPT;
 
     private function loadChunks(): array
     {
-        $cachePath = BASE_PATH . '/silverstripe-cache/rag_chunks.bin';
+        $cachePath = TEMP_PATH . '/rag_chunks.bin';
         if (file_exists($cachePath)) {
             $data = file_get_contents($cachePath);
             if ($data !== false) {
@@ -342,7 +342,7 @@ PROMPT;
         }
 
         // Successful response: clear offline flag if it was set
-        $flagFile = BASE_PATH . '/silverstripe-cache/rag_offline.flag';
+        $flagFile = TEMP_PATH . '/rag_offline.flag';
         if (file_exists($flagFile)) {
             @unlink($flagFile);
         }
@@ -354,7 +354,7 @@ PROMPT;
 
     private function handleQuotaExhausted(): void
     {
-        $flagFile = BASE_PATH . '/silverstripe-cache/rag_offline.flag';
+        $flagFile = TEMP_PATH . '/rag_offline.flag';
 
         if (file_exists($flagFile)) {
             return; // already notified
@@ -376,7 +376,7 @@ PROMPT;
         }
 
         $siteUrl  = Director::absoluteBaseURL();
-        $flagPath = BASE_PATH . '/silverstripe-cache/rag_offline.flag';
+        $flagPath = TEMP_PATH . '/rag_offline.flag';
         $time     = date('d-m-Y H:i');
 
         $html = "
@@ -472,7 +472,7 @@ PROMPT;
         }
 
         $ip   = $request->getIP();
-        $file = BASE_PATH . '/silverstripe-cache/rag_rl_' . md5($ip) . '.json';
+        $file = TEMP_PATH . '/rag_rl_' . md5($ip) . '.json';
         $now  = time();
 
         $timestamps = [];

@@ -317,9 +317,12 @@ class RAGIndexTask extends BuildTask
 
     private function writeCache(array $chunks): void
     {
-        $cachePath = BASE_PATH . '/silverstripe-cache/rag_chunks.bin';
-        file_put_contents($cachePath, serialize($chunks));
-        $this->log(sprintf('  Cache saved: %d chunks → %s', count($chunks), $cachePath));
+        $cachePath = TEMP_PATH . '/rag_chunks.bin';
+        if (@file_put_contents($cachePath, serialize($chunks)) !== false) {
+            $this->log(sprintf('  Cache saved: %d chunks → %s', count($chunks), $cachePath));
+        } else {
+            $this->log('  ! Cache write failed (non-fatal): ' . $cachePath . ' — assistant reads from the database.');
+        }
     }
 
     private function resolveApiKey(): string
