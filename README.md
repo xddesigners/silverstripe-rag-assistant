@@ -41,6 +41,12 @@ XD\RAGAssistant\Controllers\AssistantController:
   embedding_model: 'text-embedding-3-small'
   embedding_dimensions: 512
   top_k: 5
+  # --- Abuse / cost protection (the endpoint is public and spends OpenAI tokens) ---
+  rate_limit_max: 10           # requests per IP per window (0 = disabled)
+  rate_limit_window: 60        # seconds
+  daily_request_limit: 0       # site-wide hard cap on token-spending requests per day (0 = disabled; counts requests, not tokens)
+  require_security_token: true # widget embeds the SS CSRF token; blind/cross-site POSTs get 403.
+                               # Disable only if the page is served from a full-page/static cache.
   system_prompt: >
     You are a referral assistant for example.com. Your task is to refer
     visitors to the correct page. Only use information from the provided
